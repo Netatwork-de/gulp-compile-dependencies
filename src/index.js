@@ -21,7 +21,7 @@ let spawn = require('child_process').spawn;
 
 let dependencyPath = 'jspm_packages/local';
 
-async function getPackageObjectAsync(repo) {
+async function getPackageObject(repo) {
 	let packageFile = path.resolve('..', path.join(repo, 'package.json'));
 
 	try {
@@ -45,43 +45,43 @@ function fileExists (filepath) {
 	}
 }
 
-async function processDependencyAsync(packagePath) {
+async function processDependency(packagePath) {
 	let packageName = packagePath.substring(0, packagePath.indexOf('@'));
 	gutil.log("Compiling package", gutil.colors.yellow(packageName));
 
-	let project = await getPackageObjectAsync(packageName);
+	let project = await getPackageObject(packageName);
 	let projectPath = path.resolve(path.join("..", packageName));
 
-	await executeNpmAsync(projectPath, "install");
+	await executeNpm(projectPath, "install");
 
 	let isJspmPresent = project.devDependencies !== undefined && project.devDependencies["jspm"] != null;
 	if (isJspmPresent) {
 		gutil.log(gutil.colors.yellow("jspm"), "is configured in this package. Running", gutil.colors.yellow("jspm install"));
-		await executeJspmAsync(projectPath);
+		await executeJspm(projectPath);
 	}
 
 	if (fileExists(path.join(projectPath, "gulpfile.js"))) {
 		gutil.log(gutil.colors.yellow("gulp"), "is configured in this package. Running", gutil.colors.yellow("gulp build"));
-		await executeGulpAsync(projectPath, "build");
+		await executeGulp(projectPath);
 	}
 }
 
-function executeGulpAsync(packagePath, tasks) {
+export function executeGulp(packagePath, tasks) {
 	gutil.log("Processing", gutil.colors.yellow("gulp"), "for", gutil.colors.yellow(packagePath));
-	return spawnProcessAsync("gulp", packagePath, ["build"]);
+	return spawnProcess("gulp", packagePath, tasks || ["build"]);
 }
 
-function executeJspmAsync(packagePath) {
+export function executeJspm(packagePath) {
 	gutil.log("Processing", gutil.colors.yellow("jspm"), "for", gutil.colors.yellow(packagePath));
-	return spawnProcessAsync("jspm", packagePath, ["install"]);
+	return spawnProcess("jspm", packagePath || path.resolve("."), ["install"]);
 }
 
-function executeNpmAsync(packagePath, action) {
+export function executeNpm(packagePath, action) {
 	gutil.log("Processing", gutil.colors.yellow("npm"), "for", gutil.colors.yellow(packagePath));
-	return spawnProcessAsync("npm", packagePath, ["install"]);
+	return spawnProcess("npm", packagePath || path.resolve("."), [action || "install"]);
 }
 
-function spawnProcessAsync(command, workingDirectory, args) {
+function spawnProcess(command, workingDirectory, args) {
 	let runningOnWindows = /^win/.test(process.platform);
 	let nodeModulesPath = path.join(workingDirectory, 'node_modules', '.bin');
 	let envCopy = {};
@@ -128,14 +128,12 @@ function isDirectory(fileName) {
 	return fs.lstatSync(filePath).isDirectory();
 }
 
-async function buildDependencies() {
+export async function buildDependencies() {
 	gutil.log("Building local dependencies")
 	let files = await asp(fs.readdir)(dependencyPath);
 	for (let entry of files) {
 		if (isDirectory(entry)) {
-			await processDependencyAsync(entry);
+			await processDependency(entry);
 		}
 	}
 }
-
-module.exports = buildDependencies;

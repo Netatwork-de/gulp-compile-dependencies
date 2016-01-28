@@ -20,16 +20,16 @@ Setup a gulp task `compile-dependencies` using this code:
 ```js
 'use strict'
 
-var gulp = require('gulp');
-var compileDependencies = require('gulp-compile-dependencies')
-var tools = require('gulp-jspm-local');
-var runSequence = require('run-sequence');
+let gulp = require('gulp');
+let dependencies = require('gulp-compile-dependencies')
+let tools = require('gulp-jspm-local');
+let runSequence = require('run-sequence');
 
 gulp.task('compile-solution', () =>
-	compileDependencies()
+	dependencies.buildDependencies()
 		.then(() => tools.updateLocalDependencies())
+		.then(() => dependencies.executeJspm())
 		.then(() => runSequence("export")));
-
 ```
 
 
