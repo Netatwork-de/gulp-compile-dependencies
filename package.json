@@ -1,6 +1,6 @@
 {
 	"name": "gulp-compile-dependencies",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Resolves local jspm dependencies and builds them. Will call 'npm install', 'jspm install' and 'gulp build' on each dependency.",
 	"main": "dist/index.js",
 	"scripts": {
