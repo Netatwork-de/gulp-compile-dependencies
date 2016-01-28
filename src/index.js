@@ -21,9 +21,7 @@ let spawn = require('child_process').spawn;
 
 let dependencyPath = 'jspm_packages/local';
 
-async function getPackageObject(repo) {
-	let packageFile = path.resolve('..', path.join(repo, 'package.json'));
-
+async function getPackageObject(packageFile) {
 	try {
 		let lookupJSON = await asp(fs.readFile)(packageFile);
 		return JSON.parse(lookupJSON.toString());
@@ -49,7 +47,7 @@ async function processDependency(packagePath) {
 	let packageName = packagePath.substring(0, packagePath.indexOf('@'));
 	gutil.log("Compiling package", gutil.colors.yellow(packageName));
 
-	let project = await getPackageObject(packageName);
+	let project = await getPackageObject(path.resolve('..', path.join(packageName, 'package.json')));
 	let projectPath = path.resolve(path.join("..", packageName));
 
 	await executeNpm(projectPath, "install");
@@ -126,6 +124,24 @@ function spawnProcess(command, workingDirectory, args) {
 function isDirectory(fileName) {
 	let filePath = path.resolve(dependencyPath, fileName);
 	return fs.lstatSync(filePath).isDirectory();
+}
+
+async function getLocalDependencies() {
+	let packageConfig = await getPackageObject("package.json");
+
+	if (!packageConfig.jspm || !packageConfig.jspm.dependencies) throw "package.json does have jspm configured.";
+
+	let localDepedencies = [];
+
+	var dependencies = packageConfig.jspm.dependencies;
+	for (let dependency in dependencies)
+	{
+		var value = dependencies[dependency];
+		if (value.indexOf("local:") == 0) {
+			localDepedencies.push(value.subString("local:".length))
+		}
+	}
+	return localDepedencies;
 }
 
 export async function buildDependencies() {
