@@ -146,10 +146,8 @@ async function getLocalDependencies() {
 
 export async function buildDependencies() {
 	gutil.log("Building local dependencies")
-	let files = await asp(fs.readdir)(dependencyPath);
-	for (let entry of files) {
-		if (isDirectory(entry)) {
-			await processDependency(entry);
-		}
+	let dependencies = getLocalDependencies();
+	for (let entry of dependencies) {
+		await processDependency(entry);
 	}
 }
