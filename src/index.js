@@ -138,7 +138,7 @@ async function getLocalDependencies() {
 	{
 		var value = dependencies[dependency];
 		if (value.indexOf("local:") == 0) {
-			localDepedencies.push(value.subString("local:".length))
+			localDepedencies.push(value.substring("local:".length))
 		}
 	}
 	return localDepedencies;
@@ -146,7 +146,7 @@ async function getLocalDependencies() {
 
 export async function buildDependencies() {
 	gutil.log("Building local dependencies")
-	let dependencies = getLocalDependencies();
+	let dependencies = await getLocalDependencies();
 	for (let entry of dependencies) {
 		await processDependency(entry);
 	}
