@@ -43,22 +43,28 @@ function fileExists (filepath) {
 	}
 }
 
-async function processDependency(packagePath) {
+async function processDependency(packagePath, options) {
 	let packageName = packagePath.substring(0, packagePath.indexOf('@'));
 	gutil.log("Compiling package", gutil.colors.yellow(packageName));
 
 	let project = await getPackageObject(path.resolve('..', path.join(packageName, 'package.json')));
 	let projectPath = path.resolve(path.join("..", packageName));
 
-	await executeNpm(projectPath, "install");
+	let npmInstall = (options.npmInstall !== undefined ? options.npmInstall : true);
+	let jspmInstall = (options.jspmInstall !== undefined ? options.jspmInstall : true);
+	let gulpBuild = (options.gulpBuild !== undefined ? options.gulpBuild : true);
+
+	if(npmInstall) {
+		await executeNpm(projectPath, "install");
+	}
 
 	let isJspmPresent = project.devDependencies !== undefined && project.devDependencies["jspm"] != null;
-	if (isJspmPresent) {
+	if (jspmInstall && isJspmPresent) {
 		gutil.log(gutil.colors.yellow("jspm"), "is configured in this package. Running", gutil.colors.yellow("jspm install"));
 		await executeJspm(projectPath);
 	}
 
-	if (fileExists(path.join(projectPath, "gulpfile.js"))) {
+	if (gulpBuild && fileExists(path.join(projectPath, "gulpfile.js"))) {
 		gutil.log(gutil.colors.yellow("gulp"), "is configured in this package. Running", gutil.colors.yellow("gulp build"));
 		await executeGulp(projectPath);
 	}
@@ -144,10 +150,10 @@ async function getLocalDependencies() {
 	return localDepedencies;
 }
 
-export async function buildDependencies() {
-	gutil.log("Building local dependencies")
+export async function buildDependencies(options) {
+	gutil.log("Building local dependencies");
 	let dependencies = await getLocalDependencies();
 	for (let entry of dependencies) {
-		await processDependency(entry);
+		await processDependency(entry,options);
 	}
 }

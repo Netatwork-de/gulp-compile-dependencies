@@ -25,13 +25,32 @@ let dependencies = require('gulp-compile-dependencies')
 let tools = require('gulp-jspm-local');
 let runSequence = require('run-sequence');
 
+var options = {
+	npmInstall: true;
+	jspmInstall: true;
+	gulpBuild: true;
+}
+
 gulp.task('compile-solution', () =>
-	dependencies.buildDependencies()
+	dependencies.buildDependencies(options)
 		.then(() => tools.updateLocalDependencies())
 		.then(() => dependencies.executeJspm())
 		.then(() => runSequence("export")));
 ```
 
+## Options
+
+- `npmInstall` : boolean = `true`
+
+	Executes npm install on all dependencies. 
+
+- `jspmInstall` : boolean = `true`
+
+	Executes jspm install on all dependencies.
+
+- `gulpBuild` : boolean = `true`
+
+	Executes gulp build on all dependencies.
 
 ## License
 
