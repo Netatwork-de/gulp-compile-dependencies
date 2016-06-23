@@ -121,7 +121,7 @@ function spawnProcess(command, workingDirectory, args) {
 				resolve();
 				return;
 			}
-			error = new gutil.PluginError(`${command} on ${packagePath} returned ${code}`);
+			error = new gutil.PluginError(`${command} on ${workingDirectory} returned ${code}`);
 			reject(error);
 		});
 	});
