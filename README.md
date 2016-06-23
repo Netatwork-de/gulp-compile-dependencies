@@ -26,9 +26,9 @@ let tools = require('gulp-jspm-local');
 let runSequence = require('run-sequence');
 
 var options = {
-	npmInstall: true;
-	jspmInstall: true;
-	gulpBuild: true;
+	npmInstall: true,
+	jspmInstall: true,
+	gulpBuild: true
 }
 
 gulp.task('compile-solution', () =>
