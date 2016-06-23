@@ -52,7 +52,7 @@ async function processDependency(packagePath, options) {
 
 	let npmInstall = (options && options.npmInstall) ||true;
 	let jspmInstall = (options && options.jspmInstall) || true;
-	let gulpBuild = (otpions && options.gulpBuild) || true;
+	let gulpBuild = (options && options.gulpBuild) || true;
 
 	if(npmInstall) {
 		await executeNpm(projectPath, "install");
