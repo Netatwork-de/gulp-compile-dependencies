@@ -50,9 +50,9 @@ async function processDependency(packagePath, options) {
 	let project = await getPackageObject(path.resolve('..', path.join(packageName, 'package.json')));
 	let projectPath = path.resolve(path.join("..", packageName));
 
-	let npmInstall = (options.npmInstall !== undefined ? options.npmInstall : true);
-	let jspmInstall = (options.jspmInstall !== undefined ? options.jspmInstall : true);
-	let gulpBuild = (options.gulpBuild !== undefined ? options.gulpBuild : true);
+	let npmInstall = (options && options.npmInstall) ||true;
+	let jspmInstall = (options && options.jspmInstall) || true;
+	let gulpBuild = (otpions && options.gulpBuild) || true;
 
 	if(npmInstall) {
 		await executeNpm(projectPath, "install");
